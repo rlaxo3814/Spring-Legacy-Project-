@@ -1,0 +1,130 @@
+Eclipse Spring Legacy project 환경 설정
+먼저 Project Explorer 에서 빈공간에서 마우스 우클릭 New 클릭 다음 other 클릭 Spring 폴더 찾아서-Spring Legacy Project 클릭-Next 클릭
+Project name 입력
+그런다음
+Persistence 폴더에
+Spring MVC Project 클릭
+밑에 Next 버튼 클릭
+화면이 넘어가고
+패키지 이름 입력하라고 나옴
+EX) mc.sn.nvidia 
+*패키지 이름에 꼭 점이 두개 들어 가야 한다.
+입력이 완료되면 밑에 Finish 버튼 클릭
+그러면 왼쪽 Project Explorer에 자신이 만든 Spring Legacy Project가 보일 것이다.
+그런다음 기존의 잘만들어지 환경설정 파일들을  복사 붙여 넣기 하면된다.
+pom.xml 자신의 프로젝트 이름으로 고치기
+<artifactId>nvidia</artifactId>
+<name>Nvidia</name>
+web.xml 복사 붙여넣기
+(Config 폴더(jdbc폴더+jdbc.properties)) - WEb-INF 하위폴더로 복사 붙여넣기
+jdbc.properties
+jdbc.driverClassName=com.mysql.cj.jdbc.Driver
+jdbc.url=jdbc:mysql://localhost:3306/kdt13?useUnicode=true&characterEncoding=utf8
+jdbc.username=****
+jdbc.password=****
+Spring 폴더에는 action-mybatis.xml 붙여넣기
+Spring 하위폴더인 appServlet 폴더에는 servlet-context.xml 붙여넣고 base Package 부분 자신의 패키지 이름으로 바꿀것 EX)mc.sn.nvidia
+resources 폴더 안에 mybatis 폴더(mappers폴더(member.xml), model폴더(modelConfig.xml)) 복사 붙여넣기
+member.xml 수정하기
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.member">
+	<resultMap id="memResult" type="nvidiaVO">
+		<result property="id" column="id" />
+        <result property="pwd" column="pwd" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="joinDate" column="joinDate" />
+	</resultMap> 
+	<!-- 
+	<resultMap id="memResult" type="java.util.HashMap">
+      <result property="id" column="id" />
+      <result property="pwd" column="pwd" />
+      <result property="name" column="name" />
+      <result property="email" column="email" />
+      <result property="joinDate" column="joinDate" />
+   </resultMap> -->
+
+
+	<select id="selectAllMemberList" resultMap="memResult">
+      <![CDATA[
+         select * from t_member	order by joinDate desc	 	
+      ]]>
+	</select>
+    
+     <insert id="insertMember"  parameterType="nvidiaVO">
+		<![CDATA[
+		 insert into t_member(id,pwd, name, email)
+		 values(#{id}, #{pwd}, #{name}, #{email})
+		]]>      
+	</insert>
+	
+   
+   <update id="updateMember"  parameterType="nvidiaVO">
+     <![CDATA[
+	     update t_member
+	     set pwd=#{pwd}, name=#{name}, email=#{email}
+	     where
+	     id=#{id}
+      ]]>      
+   </update> 
+     
+   <delete id="deleteMember"  parameterType="String">
+	<![CDATA[
+	   delete from  t_member
+	   where
+	   id=#{id}
+	]]>      
+  </delete>
+  <select id="loginById"  resultType="nvidiaVO"   parameterType="java.util.HashMap" >
+	<![CDATA[
+		select * from t_member	
+		where id=#{id} and pwd=#{pwd}		
+	]]>
+  </select>
+  
+   <select id="selectById"  resultType="nvidiaVO"   parameterType="String" >
+	<![CDATA[
+		select * from t_member	
+		where id=#{id}		
+	]]>
+  </select>
+</mapper>
+
+modelConfig.xml 수정하기 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias type="mc.sn.nvidia.vo.NvidiaVO"  alias="nvidiaVO" />
+	</typeAliases>
+</configuration>
+
+다음
+패키지를 만들어 준다 
+mc.sn.nvidia.controller
+mc.sn.nvidia.dao
+mc.sn.nvidia.service
+mc.sn.nvidia.vo(vo는 오류가 많나서 복사 붙여넣기 보다는 직접 만드는 것을 추천)
+
+webapp폴더-> resources폴더-> js폴더에 (jquery-3.6.0.min.js(제이 쿼리), ajax.js(에이젝스) 파일 넣기)
+
+이렇게 다 넣어주고 밑에 중간에 보면 Servers 카테고리 클릭하고
+밑에 톰캣 서버 클릭하고 우클릭 Add and Remove 클릭
+본인이 방금 만든 Spring Legacy Project Add버튼 누르고 오른쪽으로 넘긴다.
+Finish 버튼 누른다.
+그리고 오른쪽 Run as 버튼을 누른다. 
+그러면 주르륵 실행이 되고 잘 돌아가는지 확인 하기 위해
+맨위에 Open Web Browser 지구본 모양 클릭
+Url 주소 입력란에 이렇게 입력한다
+http://localhost:9090/nvidia/
+입력하면 home.jsp 에 입력되어 있는 내용이 나온다  
+끝
+내용이 안나오거나 에러가 뜨면 환경설정이 잘못된 것이다.
+
+
